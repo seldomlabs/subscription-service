@@ -18,9 +18,14 @@ func main() {
 
 	db, err := gorm.Open(mysql.Open(cfg.MySQLDSN), &gorm.Config{})
     if err != nil {
-        log.Fatalf("Failed to connect to MySQL: %v", err)
-    }
-    db.AutoMigrate(&model.UserSubscription{})
+        log.Printf("Failed to connect to MySQL: %v", err)
+		db = nil
+    } else {
+		err = db.AutoMigrate(&model.UserSubscription{})
+		if err != nil {
+			log.Printf("Failed to migrate database: %v", err)
+		}
+	}
 
 	kafkaProducer := kafka.NewProducer(cfg.KafkaBroker)
 
